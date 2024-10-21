@@ -4,6 +4,6 @@
     }
     test={
         n2=" wrold"
-        n1="hello"
+        n1="hello","word"
     }
 }
