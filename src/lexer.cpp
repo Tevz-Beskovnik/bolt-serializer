@@ -7,6 +7,9 @@
         return true; \
     }
 
+#define MAP_MAX_NODES 22
+#define MAP_MAX_SYMBOL_TYPES 9
+
 #define MAPPING(symbol, from, to) mappings[(size_t)symbol][from] = to
 
 #define TOKEN_L_SQUIG { TokenType::L_SQUIG, "{" }
@@ -18,10 +21,14 @@
 
 namespace serializer
 {
-    int32_t mappings[9][13];
+    int32_t mappings[MAP_MAX_SYMBOL_TYPES][MAP_MAX_NODES];
 
     inline void init_mappings()
     {
+        for(uint16_t i = 0; i < MAP_MAX_SYMBOL_TYPES; i++)
+            for(uint16_t j = 0; j < MAP_MAX_NODES; j++)
+                mappings[i][j] = -1;
+
         // Zero mappings
         MAPPING(SymbolType::L_SQUIG, 0, 1);
         MAPPING(SymbolType::R_SQUIG, 0, 2);
@@ -33,9 +40,40 @@ namespace serializer
         MAPPING(SymbolType::LETTER, 5, 6);
         MAPPING(SymbolType::NUMBER, 5, 7);
 
-        // Strings - any letter
-        MAPPING(SymbolType::LETTER, 8, 9);
-        MAPPING(SymbolType::NUMBER, 8, 10);
+        MAPPING(SymbolType::LETTER, 6, 6);
+        MAPPING(SymbolType::NUMBER, 6, 7);
+        MAPPING(SymbolType::NUMBER, 7, 7);
+        MAPPING(SymbolType::LETTER, 7, 6);
+
+        // And now for the loops
+        for(uint16_t i = 8; i < 19; i++) 
+        {
+            // string mappings for any letter
+            MAPPING(SymbolType::LETTER, i, 9);
+            MAPPING(SymbolType::NUMBER, i, 10);
+            // Mappings for all other characters excluding specail characters
+            MAPPING(SymbolType::BACK_SLASH, i, 11);
+            MAPPING(SymbolType::COMMA, i, 12);
+            MAPPING(SymbolType::EQUAL, i, 13);
+            MAPPING(SymbolType::L_SQUIG, i, 14);
+            MAPPING(SymbolType::R_SQUIG, i, 15);
+            MAPPING(SymbolType::OTHER_SYMB, i, 16);
+        }
+
+        MAPPING(SymbolType::LETTER, 11, -1);
+        MAPPING(SymbolType::NUMBER, 11, -1);
+        // Mappings for all other characters excluding specail characters
+        MAPPING(SymbolType::BACK_SLASH, 11, -1);
+        MAPPING(SymbolType::COMMA, 11, -1);
+        MAPPING(SymbolType::EQUAL, 11, -1);
+        MAPPING(SymbolType::L_SQUIG, 11, -1);
+        MAPPING(SymbolType::R_SQUIG, 11, -1);
+        MAPPING(SymbolType::OTHER_SYMB, 11, -1);
+        // Special symbols
+        MAPPING(SymbolType::QUOTE, 11, 17);
+        MAPPING(SymbolType::BACK_SLASH, 11, 18);
+        
+        for(uint16_t i = 8; i < )
     }
 
     attribute_tree parse(std::stringstream& ss)
