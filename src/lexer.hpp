@@ -15,7 +15,6 @@ namespace serializer
         COMM = 3,
         WORD = 4,
         STRING = 5,
-        BLANK = 6,
     };
 
     enum class SymbolType : size_t
@@ -41,6 +40,8 @@ namespace serializer
         TokenType type;
         std::string value;
     };
+
+    void init_mappings();
 
     attribute_tree parse(std::stringstream& ss);
 }

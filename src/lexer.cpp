@@ -12,6 +12,14 @@
 
 #define MAPPING(symbol, from, to) mappings[(size_t)symbol][from] = to
 
+#define _EXPAND(args) args
+#define COND1(a) if(a)
+#define OR_COND2(a, b) if(a || b)
+#define OR_COND3(a, b, c) if(a || b || c)
+#define OR_COND4(a, b, c, d) if(a || b || c || d)
+#define GET_OR_COND(_1, _2, _3, _4, OR_CONDN, ...) OR_CONDN
+#define OR_COND(...) 
+
 #define TOKEN_L_SQUIG { TokenType::L_SQUIG, "{" }
 #define TOKEN_R_SQUIG token{ TokenType::R_SQUIG, "}" }
 #define TOKEN_EQ token{ TokenType::EQ, "=" }
@@ -73,12 +81,22 @@ namespace serializer
         MAPPING(SymbolType::QUOTE, 11, 17);
         MAPPING(SymbolType::BACK_SLASH, 11, 18);
         
-        for(uint16_t i = 8; i < )
+        for(uint16_t i = 9; i < 19; i++)
+        {
+            MAPPING(SymbolType::QUOTE, 9, 19);
+        }
+
+        MAPPING(SymbolType::QUOTE, 11, -1);
+    }
+
+    SymbolType map_char_to_symbol(char next)
+    {
+        
     }
 
     attribute_tree parse(std::stringstream& ss)
     {
-        
+
     }
 
     bool try_terminate(uint32_t state, std::string& val, token& token_ref)
@@ -91,7 +109,7 @@ namespace serializer
             TERMINATION_TOKEN(5, TOKEN_WORD(val))
             TERMINATION_TOKEN(6, TOKEN_WORD(val))
             TERMINATION_TOKEN(7, TOKEN_WORD(val))
-            TERMINATION_TOKEN(12, TOKEN_STRING(val))
+            TERMINATION_TOKEN(19, TOKEN_STRING(val))
             default:
                 return false;
         }
