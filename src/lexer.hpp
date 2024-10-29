@@ -15,6 +15,7 @@ namespace serializer
         COMM = 3,
         WORD = 4,
         STRING = 5,
+        BLANK = 6,
     };
 
     enum class SymbolType : size_t
@@ -28,6 +29,7 @@ namespace serializer
         LETTER = 6,
         BACK_SLASH = 7,
         OTHER_SYMB = 8,
+        BLANK = 9,
     };
 
     struct mapping {

@@ -8,22 +8,15 @@
     }
 
 #define MAP_MAX_NODES 22
-#define MAP_MAX_SYMBOL_TYPES 9
+#define MAP_MAX_SYMBOL_TYPES 10
 
 #define MAPPING(symbol, from, to) mappings[(size_t)symbol][from] = to
-
-#define _EXPAND(args) args
-#define COND1(a) if(a)
-#define OR_COND2(a, b) if(a || b)
-#define OR_COND3(a, b, c) if(a || b || c)
-#define OR_COND4(a, b, c, d) if(a || b || c || d)
-#define GET_OR_COND(_1, _2, _3, _4, OR_CONDN, ...) OR_CONDN
-#define OR_COND(...) 
 
 #define TOKEN_L_SQUIG { TokenType::L_SQUIG, "{" }
 #define TOKEN_R_SQUIG token{ TokenType::R_SQUIG, "}" }
 #define TOKEN_EQ token{ TokenType::EQ, "=" }
 #define TOKEN_COMM token{ TokenType::COMM, "," }
+#define TOKEN_BLANK(value) token{ TokenType::BLANK, value }
 #define TOKEN_WORD(value) token{ TokenType::WORD, value }
 #define TOKEN_STRING(value) token{ TokenType::STRING, value }
 
@@ -54,7 +47,7 @@ namespace serializer
         MAPPING(SymbolType::LETTER, 7, 6);
 
         // And now for the loops
-        for(uint16_t i = 8; i < 19; i++) 
+        for(uint16_t i = 8; i < 20; i++) 
         {
             // string mappings for any letter
             MAPPING(SymbolType::LETTER, i, 9);
@@ -66,6 +59,7 @@ namespace serializer
             MAPPING(SymbolType::L_SQUIG, i, 14);
             MAPPING(SymbolType::R_SQUIG, i, 15);
             MAPPING(SymbolType::OTHER_SYMB, i, 16);
+            MAPPING(SymbolType::BLANK, i, 17);
         }
 
         MAPPING(SymbolType::LETTER, 11, -1);
@@ -77,26 +71,40 @@ namespace serializer
         MAPPING(SymbolType::L_SQUIG, 11, -1);
         MAPPING(SymbolType::R_SQUIG, 11, -1);
         MAPPING(SymbolType::OTHER_SYMB, 11, -1);
+        MAPPING(SymbolType::BLANK, 11, -1);
         // Special symbols
-        MAPPING(SymbolType::QUOTE, 11, 17);
-        MAPPING(SymbolType::BACK_SLASH, 11, 18);
+        MAPPING(SymbolType::QUOTE, 11, 18);
+        MAPPING(SymbolType::BACK_SLASH, 11, 19);
         
         for(uint16_t i = 9; i < 19; i++)
         {
-            MAPPING(SymbolType::QUOTE, 9, 19);
+            MAPPING(SymbolType::QUOTE, i, 20);
         }
 
         MAPPING(SymbolType::QUOTE, 11, -1);
+        MAPPING(SymbolType::BLANK, 0, 21);
     }
 
     SymbolType map_char_to_symbol(char next)
     {
-        
+        if(next == '{') return SymbolType::L_SQUIG;
+        if(next == '}') return SymbolType::R_SQUIG;
+        if(next == '=') return SymbolType::EQUAL;
+        if(next == ',') return SymbolType::COMMA;
+        if(next == '"') return SymbolType::QUOTE;
+        if(next == '\\') return SymbolType::BACK_SLASH;
+        if(next >= '0' && next <= '9') return SymbolType::NUMBER;
+        if(next >= 'A' && next <= 'Z' || next >= 'a' && next <= 'z') return SymbolType::LETTER;
+        if(next == ' ' || next == '\n' || next == '\t') return SymbolType::BLANK; 
+        return SymbolType::OTHER_SYMB;
     }
 
     attribute_tree parse(std::stringstream& ss)
     {
+        attribute_tree tree;
+        uint64_t current_state = 0;
 
+        
     }
 
     bool try_terminate(uint32_t state, std::string& val, token& token_ref)
@@ -109,7 +117,8 @@ namespace serializer
             TERMINATION_TOKEN(5, TOKEN_WORD(val))
             TERMINATION_TOKEN(6, TOKEN_WORD(val))
             TERMINATION_TOKEN(7, TOKEN_WORD(val))
-            TERMINATION_TOKEN(19, TOKEN_STRING(val))
+            TERMINATION_TOKEN(20, TOKEN_STRING(val))
+            TERMINATION_TOKEN(21, TOKEN_BLANK(val))
             default:
                 return false;
         }
